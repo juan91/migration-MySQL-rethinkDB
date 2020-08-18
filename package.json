@@ -1,0 +1,31 @@
+{
+  "name": "migration-mysql-rethinkdb",
+  "authot": "JUAN DAVID DELGADO",
+  "version": "1.0.0",
+  "description": "MIGRACION DE UNA BASE DE DATOS RELACIONAL(MYSQL) A UNA NO RELACIONAL(RETHINKDB)",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node src/index"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/juan91/migration-MySQL-rethinkDB.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/juan91/migration-MySQL-rethinkDB/issues"
+  },
+  "homepage": "https://github.com/juan91/migration-MySQL-rethinkDB#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "mysql": "^2.18.1",
+    "ora": "^5.0.0",
+    "rethinkdb": "^2.4.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  }
+}
