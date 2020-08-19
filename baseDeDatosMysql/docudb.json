@@ -29,17 +29,7 @@ factura
   tipo:{
     tipo: doble,
     precio:90
-  },
-  limpieza: [
-    {
-      NumReg: 1,
-      fecha: "24/09/2010"
-    },
-    {
-      NumReg: 2,
-      fecha: "25/09/2010"
-    }
-  ]
+  }
 }
 
 //servicio
@@ -58,7 +48,6 @@ factura
    }, 
   ],
   responsable: 2,
-  asignado:[1,4]
 }
 
 //cliente
@@ -95,5 +84,16 @@ factura
       }
     ]
   },
+  codSer:1,
+  hablimpieza: [
+    {
+      numero: 1,
+      fecha: "24/09/2010"
+    },
+    {
+      numero: 2,
+      fecha: "25/09/2010"
+    }
+  ]
 }
 

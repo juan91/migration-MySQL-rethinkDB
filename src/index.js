@@ -3,28 +3,53 @@ const r = require('rethinkdb');
 const { databaseR } = require('./key');
 const ora = require('ora');
 const { esquemaFactura, esquemaHabitacion, esquemaServicio, esquemaCliente, esquemaEmpleado }= require('./esquemas');
+const { promise } = require('ora');
 // const connR = require('./databaseRethikdb');
 
-function saveRethinkDB(tabla,data = []) {
-  const spinner = ora('Migrando datos de mysql...').start();
-  spinner.color = 'yellow';
+async function eliminarTablas(conn) {
+  await Promise.all([r.tableDrop('Factura').run(conn),r.tableDrop('Empleado').run(conn),r.tableDrop('Servicio').run(conn),r.tableDrop('Habitacion').run(conn),r.tableDrop('Cliente').run(conn)]).catch(err => {});
+}
+
+async function indexTablas(conn) {
+
+  // Servicio = codServ
+  // Empleado = NumReg
+  // habitacion = numero
+  await Promise.all([
+    r.table('Servicio').indexCreate('responsable').run(conn),
+    r.table('Servicio').indexCreate('codSer').run(conn),
+  ]).catch(err => {
+    console.log('Error al generar indices');
+    console.log(err);
+  })
+}
+var conexionG = null;
+async function saveRethinkDB(tabla, data = []) {
   r.connect( databaseR, async function(err, conn) {   
+    conexionG = conn;
       if (err) {
+        const spinner = ora(`Error`).start();
          spinner.clear();
-        spinner.fail('Fallo al migrar datos');
+         spinner.fail('Fallo al migrar datos');
         throw err;
       }
+
+      const spinner2 = ora(`Creando la tabla ${tabla}`).start();
+      spinner2.color = 'yellow';
       await r.tableCreate(tabla).run(conn);
-      spinner.clear();
-      spinner.succeed(`La tabla ${tabla} creada con exito`);
+      spinner2.clear();
+      spinner2.succeed(`La tabla ${tabla} creada con exito`);
+
+      const spinner3 = ora(`Migrando datos de la tabla ${tabla}`).start();
+      spinner3.color = 'yellow';
       r.table(tabla).insert(data).run(conn, function(err, result) {
         if (err) {
-          spinner.clear();
-         spinner.fail('Fallo al migrar datos');
+          spinner3.clear();
+          spinner3.fail('Fallo al migrar datos');
          throw err;
        }
-        spinner.clear();
-        spinner.succeed(`Los datos de la tabla ${tabla} migrados con exito`);
+       spinner3.clear();
+       spinner3.succeed(`Los datos de la tabla ${tabla} migrados correctamente`);
       });     
   });
 }
@@ -54,7 +79,7 @@ async function factura() {
         console.log(err);
       });
 
-      saveRethinkDB('Factura', result);
+      await saveRethinkDB('Factura', result);
     }
   } catch (error) {
    console.log(error);
@@ -69,15 +94,14 @@ async function habitacion() {
       const arrayProcess = [];
       for (let i = 0 ; i < totalFilas; i += 1) {
         const tipo = await obtenerDatosTabla('Precio',`where Tipo = '${habitacion[i].Tipo}'`);
-        const limpieza = await obtenerDatosTabla('Limpieza',`where numero = '${habitacion[i].Numero}'`);
-        arrayProcess.push(esquemaHabitacion(habitacion[i], tipo?tipo:null, limpieza?limpieza:null))
+        arrayProcess.push(esquemaHabitacion(habitacion[i], tipo?tipo:null))
       }
 
      const result = await Promise.all(arrayProcess).catch(err => {
         console.log(err);
       });
 
-      saveRethinkDB('Habitacion', result);
+      await saveRethinkDB('Habitacion', result);
     }
   } catch (error) {
    console.log(error);
@@ -100,326 +124,7 @@ async function servicio() {
         console.log(err);
       });
 
-      saveRethinkDB('Servicio', result);
-    }
-  } catch (error) {
-   console.log(error);
-  }
-}
-
-async function servicio() {
-  try {    
-    const servicio = await obtenerDatosTabla('Servicio');  
-    const totalFilas = servicio.length;
-    if ( totalFilas > 0) {
-      const arrayProcess = [];
-      for (let i = 0 ; i < totalFilas; i += 1) {
-        const encargados = await obtenerDatosTabla('Empleado',`where CodS = '${servicio[i].CodS}'`,'NumReg');
-        const usaServicios = await obtenerDatosTabla('Usa',`where CodS = '${servicio[i].CodS}'`);
-        arrayProcess.push(esquemaServicio(servicio[i], encargados?encargados:null, usaServicios?usaServicios:null));
-      }
-
-     const result = await Promise.all(arrayProcess).catch(err => {
-        console.log(err);
-      });
-
-      saveRethinkDB('Servicio', result);
-    }
-  } catch (error) {
-   console.log(error);
-  }
-}
-
-async function servicio() {
-  try {    
-    const servicio = await obtenerDatosTabla('Servicio');  
-    const totalFilas = servicio.length;
-    if ( totalFilas > 0) {
-      const arrayProcess = [];
-      for (let i = 0 ; i < totalFilas; i += 1) {
-        const encargados = await obtenerDatosTabla('Empleado',`where CodS = '${servicio[i].CodS}'`,'NumReg');
-        const usaServicios = await obtenerDatosTabla('Usa',`where CodS = '${servicio[i].CodS}'`);
-        arrayProcess.push(esquemaServicio(servicio[i], encargados?encargados:null, usaServicios?usaServicios:null));
-      }
-
-     const result = await Promise.all(arrayProcess).catch(err => {
-        console.log(err);
-      });
-
-      saveRethinkDB('Servicio', result);
-    }
-  } catch (error) {
-   console.log(error);
-  }
-}async function servicio() {
-  try {    
-    const servicio = await obtenerDatosTabla('Servicio');  
-    const totalFilas = servicio.length;
-    if ( totalFilas > 0) {
-      const arrayProcess = [];
-      for (let i = 0 ; i < totalFilas; i += 1) {
-        const encargados = await obtenerDatosTabla('Empleado',`where CodS = '${servicio[i].CodS}'`,'NumReg');
-        const usaServicios = await obtenerDatosTabla('Usa',`where CodS = '${servicio[i].CodS}'`);
-        arrayProcess.push(esquemaServicio(servicio[i], encargados?encargados:null, usaServicios?usaServicios:null));
-      }
-
-     const result = await Promise.all(arrayProcess).catch(err => {
-        console.log(err);
-      });
-
-      saveRethinkDB('Servicio', result);
-    }
-  } catch (error) {
-   console.log(error);
-  }
-}async function servicio() {
-  try {    
-    const servicio = await obtenerDatosTabla('Servicio');  
-    const totalFilas = servicio.length;
-    if ( totalFilas > 0) {
-      const arrayProcess = [];
-      for (let i = 0 ; i < totalFilas; i += 1) {
-        const encargados = await obtenerDatosTabla('Empleado',`where CodS = '${servicio[i].CodS}'`,'NumReg');
-        const usaServicios = await obtenerDatosTabla('Usa',`where CodS = '${servicio[i].CodS}'`);
-        arrayProcess.push(esquemaServicio(servicio[i], encargados?encargados:null, usaServicios?usaServicios:null));
-      }
-
-     const result = await Promise.all(arrayProcess).catch(err => {
-        console.log(err);
-      });
-
-      saveRethinkDB('Servicio', result);
-    }
-  } catch (error) {
-   console.log(error);
-  }
-}async function servicio() {
-  try {    
-    const servicio = await obtenerDatosTabla('Servicio');  
-    const totalFilas = servicio.length;
-    if ( totalFilas > 0) {
-      const arrayProcess = [];
-      for (let i = 0 ; i < totalFilas; i += 1) {
-        const encargados = await obtenerDatosTabla('Empleado',`where CodS = '${servicio[i].CodS}'`,'NumReg');
-        const usaServicios = await obtenerDatosTabla('Usa',`where CodS = '${servicio[i].CodS}'`);
-        arrayProcess.push(esquemaServicio(servicio[i], encargados?encargados:null, usaServicios?usaServicios:null));
-      }
-
-     const result = await Promise.all(arrayProcess).catch(err => {
-        console.log(err);
-      });
-
-      saveRethinkDB('Servicio', result);
-    }
-  } catch (error) {
-   console.log(error);
-  }
-}async function servicio() {
-  try {    
-    const servicio = await obtenerDatosTabla('Servicio');  
-    const totalFilas = servicio.length;
-    if ( totalFilas > 0) {
-      const arrayProcess = [];
-      for (let i = 0 ; i < totalFilas; i += 1) {
-        const encargados = await obtenerDatosTabla('Empleado',`where CodS = '${servicio[i].CodS}'`,'NumReg');
-        const usaServicios = await obtenerDatosTabla('Usa',`where CodS = '${servicio[i].CodS}'`);
-        arrayProcess.push(esquemaServicio(servicio[i], encargados?encargados:null, usaServicios?usaServicios:null));
-      }
-
-     const result = await Promise.all(arrayProcess).catch(err => {
-        console.log(err);
-      });
-
-      saveRethinkDB('Servicio', result);
-    }
-  } catch (error) {
-   console.log(error);
-  }
-}async function servicio() {
-  try {    
-    const servicio = await obtenerDatosTabla('Servicio');  
-    const totalFilas = servicio.length;
-    if ( totalFilas > 0) {
-      const arrayProcess = [];
-      for (let i = 0 ; i < totalFilas; i += 1) {
-        const encargados = await obtenerDatosTabla('Empleado',`where CodS = '${servicio[i].CodS}'`,'NumReg');
-        const usaServicios = await obtenerDatosTabla('Usa',`where CodS = '${servicio[i].CodS}'`);
-        arrayProcess.push(esquemaServicio(servicio[i], encargados?encargados:null, usaServicios?usaServicios:null));
-      }
-
-     const result = await Promise.all(arrayProcess).catch(err => {
-        console.log(err);
-      });
-
-      saveRethinkDB('Servicio', result);
-    }
-  } catch (error) {
-   console.log(error);
-  }
-}async function servicio() {
-  try {    
-    const servicio = await obtenerDatosTabla('Servicio');  
-    const totalFilas = servicio.length;
-    if ( totalFilas > 0) {
-      const arrayProcess = [];
-      for (let i = 0 ; i < totalFilas; i += 1) {
-        const encargados = await obtenerDatosTabla('Empleado',`where CodS = '${servicio[i].CodS}'`,'NumReg');
-        const usaServicios = await obtenerDatosTabla('Usa',`where CodS = '${servicio[i].CodS}'`);
-        arrayProcess.push(esquemaServicio(servicio[i], encargados?encargados:null, usaServicios?usaServicios:null));
-      }
-
-     const result = await Promise.all(arrayProcess).catch(err => {
-        console.log(err);
-      });
-
-      saveRethinkDB('Servicio', result);
-    }
-  } catch (error) {
-   console.log(error);
-  }
-}async function servicio() {
-  try {    
-    const servicio = await obtenerDatosTabla('Servicio');  
-    const totalFilas = servicio.length;
-    if ( totalFilas > 0) {
-      const arrayProcess = [];
-      for (let i = 0 ; i < totalFilas; i += 1) {
-        const encargados = await obtenerDatosTabla('Empleado',`where CodS = '${servicio[i].CodS}'`,'NumReg');
-        const usaServicios = await obtenerDatosTabla('Usa',`where CodS = '${servicio[i].CodS}'`);
-        arrayProcess.push(esquemaServicio(servicio[i], encargados?encargados:null, usaServicios?usaServicios:null));
-      }
-
-     const result = await Promise.all(arrayProcess).catch(err => {
-        console.log(err);
-      });
-
-      saveRethinkDB('Servicio', result);
-    }
-  } catch (error) {
-   console.log(error);
-  }
-}async function servicio() {
-  try {    
-    const servicio = await obtenerDatosTabla('Servicio');  
-    const totalFilas = servicio.length;
-    if ( totalFilas > 0) {
-      const arrayProcess = [];
-      for (let i = 0 ; i < totalFilas; i += 1) {
-        const encargados = await obtenerDatosTabla('Empleado',`where CodS = '${servicio[i].CodS}'`,'NumReg');
-        const usaServicios = await obtenerDatosTabla('Usa',`where CodS = '${servicio[i].CodS}'`);
-        arrayProcess.push(esquemaServicio(servicio[i], encargados?encargados:null, usaServicios?usaServicios:null));
-      }
-
-     const result = await Promise.all(arrayProcess).catch(err => {
-        console.log(err);
-      });
-
-      saveRethinkDB('Servicio', result);
-    }
-  } catch (error) {
-   console.log(error);
-  }
-}async function servicio() {
-  try {    
-    const servicio = await obtenerDatosTabla('Servicio');  
-    const totalFilas = servicio.length;
-    if ( totalFilas > 0) {
-      const arrayProcess = [];
-      for (let i = 0 ; i < totalFilas; i += 1) {
-        const encargados = await obtenerDatosTabla('Empleado',`where CodS = '${servicio[i].CodS}'`,'NumReg');
-        const usaServicios = await obtenerDatosTabla('Usa',`where CodS = '${servicio[i].CodS}'`);
-        arrayProcess.push(esquemaServicio(servicio[i], encargados?encargados:null, usaServicios?usaServicios:null));
-      }
-
-     const result = await Promise.all(arrayProcess).catch(err => {
-        console.log(err);
-      });
-
-      saveRethinkDB('Servicio', result);
-    }
-  } catch (error) {
-   console.log(error);
-  }
-}async function servicio() {
-  try {    
-    const servicio = await obtenerDatosTabla('Servicio');  
-    const totalFilas = servicio.length;
-    if ( totalFilas > 0) {
-      const arrayProcess = [];
-      for (let i = 0 ; i < totalFilas; i += 1) {
-        const encargados = await obtenerDatosTabla('Empleado',`where CodS = '${servicio[i].CodS}'`,'NumReg');
-        const usaServicios = await obtenerDatosTabla('Usa',`where CodS = '${servicio[i].CodS}'`);
-        arrayProcess.push(esquemaServicio(servicio[i], encargados?encargados:null, usaServicios?usaServicios:null));
-      }
-
-     const result = await Promise.all(arrayProcess).catch(err => {
-        console.log(err);
-      });
-
-      saveRethinkDB('Servicio', result);
-    }
-  } catch (error) {
-   console.log(error);
-  }
-}async function servicio() {
-  try {    
-    const servicio = await obtenerDatosTabla('Servicio');  
-    const totalFilas = servicio.length;
-    if ( totalFilas > 0) {
-      const arrayProcess = [];
-      for (let i = 0 ; i < totalFilas; i += 1) {
-        const encargados = await obtenerDatosTabla('Empleado',`where CodS = '${servicio[i].CodS}'`,'NumReg');
-        const usaServicios = await obtenerDatosTabla('Usa',`where CodS = '${servicio[i].CodS}'`);
-        arrayProcess.push(esquemaServicio(servicio[i], encargados?encargados:null, usaServicios?usaServicios:null));
-      }
-
-     const result = await Promise.all(arrayProcess).catch(err => {
-        console.log(err);
-      });
-
-      saveRethinkDB('Servicio', result);
-    }
-  } catch (error) {
-   console.log(error);
-  }
-}async function servicio() {
-  try {    
-    const servicio = await obtenerDatosTabla('Servicio');  
-    const totalFilas = servicio.length;
-    if ( totalFilas > 0) {
-      const arrayProcess = [];
-      for (let i = 0 ; i < totalFilas; i += 1) {
-        const encargados = await obtenerDatosTabla('Empleado',`where CodS = '${servicio[i].CodS}'`,'NumReg');
-        const usaServicios = await obtenerDatosTabla('Usa',`where CodS = '${servicio[i].CodS}'`);
-        arrayProcess.push(esquemaServicio(servicio[i], encargados?encargados:null, usaServicios?usaServicios:null));
-      }
-
-     const result = await Promise.all(arrayProcess).catch(err => {
-        console.log(err);
-      });
-
-      saveRethinkDB('Servicio', result);
-    }
-  } catch (error) {
-   console.log(error);
-  }
-}async function servicio() {
-  try {    
-    const servicio = await obtenerDatosTabla('Servicio');  
-    const totalFilas = servicio.length;
-    if ( totalFilas > 0) {
-      const arrayProcess = [];
-      for (let i = 0 ; i < totalFilas; i += 1) {
-        const encargados = await obtenerDatosTabla('Empleado',`where CodS = '${servicio[i].CodS}'`,'NumReg');
-        const usaServicios = await obtenerDatosTabla('Usa',`where CodS = '${servicio[i].CodS}'`);
-        arrayProcess.push(esquemaServicio(servicio[i], encargados?encargados:null, usaServicios?usaServicios:null));
-      }
-
-     const result = await Promise.all(arrayProcess).catch(err => {
-        console.log(err);
-      });
-
-      saveRethinkDB('Servicio', result);
+      await saveRethinkDB('Servicio', result);
     }
   } catch (error) {
    console.log(error);
@@ -441,7 +146,7 @@ async function cliente() {
         console.log(err);
       });
 
-      saveRethinkDB('Reserva', result);
+      await saveRethinkDB('Cliente', result);
     }
   } catch (error) {
    console.log(error);
@@ -457,19 +162,28 @@ async function empleado() {
       for (let i = 0 ; i < totalFilas; i += 1) {
         const proveedor = await obtenerDatosTabla('Proveedor',`where NumReg = ${empleado[i].NumReg}`,'*');
         const facturas = await obtenerDatosTabla('Factura_Prov',`where NumReg = ${empleado[i].NumReg}`,'*');
-        arrayProcess.push(esquemaEmpleado(empleado[i], proveedor?proveedor:null, facturas?facturas:null));
+        const limpieza = await obtenerDatosTabla('Limpieza',`where NumReg = ${empleado[i].NumReg}`,'*');
+        arrayProcess.push(esquemaEmpleado(empleado[i], proveedor?proveedor:null, facturas?facturas:null, limpieza?limpieza:null));
       }
 
      const result = await Promise.all(arrayProcess).catch(err => {
         console.log(err);
       });
 
-      saveRethinkDB('Empleado', result);
+      await saveRethinkDB('Empleado', result);
     }
   } catch (error) {
    console.log(error);
   }
 }
 
-//Factura();
-empleado();
+async function main() {  
+ await Promise.all([factura(), habitacion(), servicio(), empleado(), cliente()]).catch(err => {
+    console.log('Error main',err);
+  });
+  console.log('sigaaaaaaaaaaa index');
+   // creando index    
+   //await indexTablas(conexionG);
+}
+
+main();

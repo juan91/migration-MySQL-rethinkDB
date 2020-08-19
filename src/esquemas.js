@@ -3,7 +3,7 @@ module.exports = {
     let servicios =  [];
     let formaPago =  null;
   
-    if (formaP && forma.length > 0) {
+    if (formaP && formaP.length > 0) {
       formaPago = {
         forma: formaP[0].Forma,
         comision: formaP[0].comision
@@ -30,22 +30,14 @@ module.exports = {
     return esquemaFactura;
   },
 
-  esquemaHabitacion(fila, tipos = null, limpiezas = null) {
+  esquemaHabitacion(fila, tipo = null) {
      
-    let dataTipos = [];
-    let dataLimpiza = [];
+    let dataTipos = null;
 
-    if (tipos && tipos.length > 0) {
-      tipos.forEach(element => {
-        dataTipos.push({ tipo: element.Tipo, precio: element.precio})  
-      });      
+    if (tipo  && tipo.length > 0) {     
+        dataTipos = { tipo: tipo[0].Tipo, precio: tipo[0].precio }       
     }
 
-    if (limpiezas && limpiezas.length > 0) {
-      limpiezas.forEach(element => {
-        dataLimpiza.push({ NumReg: element.NumReg, fecha: element.Fecha})  
-      });      
-    }
     const esquemaHabitacion = {
       numero: fila.Numero,
       superficie: fila.superficie,
@@ -53,7 +45,6 @@ module.exports = {
       terraza: fila.terraza,
       puedesupletoria: fila.puedesupletoria,
       tipo: dataTipos,
-      limpieza: dataLimpiza,
     }
     return esquemaHabitacion;
   },
@@ -65,7 +56,7 @@ module.exports = {
 
     if (encargado && encargado.length > 0) {
       encargado.forEach(element => {
-        dataEncargado.push({ tipo: element.NumReg})  
+        dataEncargado.push(element.NumReg);
       });      
     }
 
@@ -81,7 +72,6 @@ module.exports = {
       costeinterno: fila.costeinterno,
       usaServicio: usaSer,
       responsable: fila.NumReg,
-      asignado: dataEncargado
     }
     return esquemaServicio;
   },
@@ -107,9 +97,10 @@ module.exports = {
     return esquemaCliente;
   },
 
-  esquemaEmpleado(fila, proveedor = null, facturas = null) {
+  esquemaEmpleado(fila, proveedor = null, facturas = null, limpiezas = null) {
    
     let datafacturas = [];
+    let datalimpiezas = [];
     let dataProveedor = null;
     if (proveedor && proveedor.length > 0) {
     
@@ -126,6 +117,12 @@ module.exports = {
       });      
     }
 
+    if (limpiezas && limpiezas.length > 0) {
+      limpiezas.forEach(element => {
+        datalimpiezas.push({ numero: element.Numero, fecha: element.Fecha})  
+      });      
+    }
+
     const esquemaEmpleado = {
       NumReg: fila.NumReg,
       nombre: fila.Nombre,
@@ -135,6 +132,8 @@ module.exports = {
         dataProveedor,
         facturas: datafacturas
       },
+      codSer: fila.CodS,
+      hablimpieza: limpiezas
     }
     return esquemaEmpleado;
   },
