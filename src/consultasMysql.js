@@ -27,11 +27,24 @@ async function main() {
   // console.timeEnd('time');
 
   //# D
+  //  console.time('time');
+  // const result = await obtenerDatosTabla('Empleado',` where Empleado.numreg in  (select mitabla.numreg from 
+  //   (select numreg, numero from Limpieza GROUP by numero, numreg ) as mitabla GROUP by mitabla.numreg
+  //   having count(*) = (SELECT count(*) FROM Habitacion));`,'*');
+  // console.log(result);
+  // console.timeEnd('time');
 
+  //# E
+  //  console.time('time');
+  // const result = await obtenerDatosTabla('Proveedor',`where nif in 
+  // (select nif from Factura_Prov where numreg NOT IN (select numreg from Servicio) group by NIF)`,'nif, nombre, direccion');
+  // console.log(result);
+  // console.timeEnd('time');
+
+    //# C
    console.time('time');
-  const result = await obtenerDatosTabla('Empleado',` where Empleado.numreg in  (select mitabla.numreg from 
-    (select numreg, numero from Limpieza GROUP by numero, numreg ) as mitabla GROUP by mitabla.numreg
-    having count(*) = (SELECT count(*) FROM Habitacion));`,'*');
+  const result = await obtenerDatosTabla('Cliente',`where DNI IN (Select DNI from (SELECT DNI,Tipo, count(*) FROM Factura join Habitacion on Habitacion.Numero = Factura.Numero group by DNI, Tipo) as mitable
+  group by DNI having count(*)  = (select count(*) from Precio))`,'*');
   console.log(result);
   console.timeEnd('time');
 }

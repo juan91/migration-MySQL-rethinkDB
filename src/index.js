@@ -12,9 +12,11 @@ async function eliminarTablas(conn) {
 
 async function indexTablas(conn) {
 
-  // Servicio = codServ
-  // Empleado = NumReg
+  // Servicio = codServ, responsable
+  // Empleado = NumReg, hablimpieza
   // habitacion = numero
+  // cliente = DNI
+
   await Promise.all([
     r.table('Servicio').indexCreate('responsable').run(conn),
     r.table('Servicio').indexCreate('codSer').run(conn),
