@@ -35,25 +35,25 @@ r.connect( databaseR, async function(err, conn) {
 
 
     /// consulta d
-    //{'hablimpieza':['Numero']}
-    // console.time('time');
-    // r.table('Empleado').pluck('NumReg', {'hablimpieza':['Numero']}).filter(data => {
-    //   return data('hablimpieza').ne([])
-    // }).map(data => {
-    //   return {
-    //     HabitacionesLimpiadas: data('hablimpieza').pluck('Numero').distinct().count(),
-    //     Numreg: data('NumReg')
-    //   }
-    // }).filter(data => {
-    //   return data('HabitacionesLimpiadas').eq(r.table('Habitacion').count())
-    // }).eqJoin('Numreg', r.table('Empleado'), {index: 'NumReg'}).zip().pluck('nombre','sueldo','incorporacion')
-    // .run(conn, function(err, cursor){
-    //     if (err) throw err;
-    //     cursor.toArray(function(err, result) {
-    //      console.log(JSON.stringify(result));
-    //     });
-    //     console.timeEnd('time');
-    // });
+    //{'habitacionAseo':['Numero']}
+    console.time('time');
+    r.table('Empleado').pluck('NumReg', {'habitacionAseo':['Numero']}).filter(data => {
+      return data('habitacionAseo').ne([])
+    }).map(data => {
+      return {
+        HabitacionesLimpiadas: data('habitacionAseo').pluck('Numero').distinct().count(),
+        Numreg: data('NumReg')
+      }
+    }).filter(data => {
+      return data('HabitacionesLimpiadas').eq(r.table('Habitacion').count())
+    }).eqJoin('Numreg', r.table('Empleado'), {index: 'NumReg'}).zip().pluck('nombre','sueldo','incorporacion')
+    .run(conn, function(err, cursor){
+        if (err) throw err;
+        cursor.toArray(function(err, result) {
+         console.log(JSON.stringify(result));
+        });
+        console.timeEnd('time');
+    });
 
 
     /// consulta e
@@ -76,28 +76,28 @@ r.connect( databaseR, async function(err, conn) {
 
 
 
-    console.time('time');
-    r.table('Factura').eqJoin('numeroHabitacion', r.table('Habitacion'), { index: 'numero' })
-    .zip().pluck('DNI',{'tipo':['tipo']})
-    .group('DNI').ungroup()
-    .map(data => {
-      return data('reduction')
-    })
-    .map(data => {
-      return {
-        cant: data('tipo').pluck('tipo').distinct().count(),
-        DNI: data('DNI').distinct()(0),
-      }
-    })
-    .filter(data => {
-      return data('cant').eq(2)
-    })
-    .eqJoin('DNI', r.table('Cliente'), {index:'DNI'}).zip().pluck('Nombre','Apellidos','Domicilio','Telefono')
-    .run(conn, function(err, cursor){
-        if (err) throw err;
-        cursor.toArray(function(err, result) {
-         console.log(JSON.stringify(result));
-        });
-        console.timeEnd('time');
-    });
+    // console.time('time');
+    // r.table('Factura').eqJoin('numeroHabitacion', r.table('Habitacion'), { index: 'numero' })
+    // .zip().pluck('DNI',{'tipo':['tipo']})
+    // .group('DNI').ungroup()
+    // .map(data => {
+    //   return data('reduction')
+    // })
+    // .map(data => {
+    //   return {
+    //     cant: data('tipo').pluck('tipo').distinct().count(),
+    //     DNI: data('DNI').distinct()(0),
+    //   }
+    // })
+    // .filter(data => {
+    //   return data('cant').eq(2)
+    // })
+    // .eqJoin('DNI', r.table('Cliente'), {index:'DNI'}).zip().pluck('Nombre','Apellidos','Domicilio','Telefono')
+    // .run(conn, function(err, cursor){
+    //     if (err) throw err;
+    //     cursor.toArray(function(err, result) {
+    //      console.log(JSON.stringify(result));
+    //     });
+    //     console.timeEnd('time');
+    // });
 });

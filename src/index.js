@@ -10,51 +10,39 @@ async function eliminarTablas(conn) {
   await Promise.all([r.tableDrop('Factura').run(conn),r.tableDrop('Empleado').run(conn),r.tableDrop('Servicio').run(conn),r.tableDrop('Habitacion').run(conn),r.tableDrop('Cliente').run(conn)]).catch(err => {});
 }
 
-async function indexTablas(conn) {
+async function indexTablas() {
 
   // Servicio = codServ, responsable
   // Empleado = NumReg, hablimpieza
   // habitacion = numero
   // cliente = DNI
-
+  const conn = await r.connect(databaseR); 
   await Promise.all([
     r.table('Servicio').indexCreate('responsable').run(conn),
     r.table('Servicio').indexCreate('codSer').run(conn),
+    r.table('Empleado').indexCreate('NumReg').run(conn),
+    r.table('Empleado').indexCreate('hablimpieza').run(conn),
+    r.table('Habitacion').indexCreate('numero').run(conn),
+    r.table('Cliente').indexCreate('DNI').run(conn),
   ]).catch(err => {
-    console.log('Error al generar indices');
-    console.log(err);
+    spinner2.clear();
+    spinner2.fail(`Error al crear indices: ${JSON.stringify(err)}`);
   })
 }
-var conexionG = null;
+
 async function saveRethinkDB(tabla, data = []) {
-  r.connect( databaseR, async function(err, conn) {   
-    conexionG = conn;
-      if (err) {
-        const spinner = ora(`Error`).start();
-         spinner.clear();
-         spinner.fail('Fallo al migrar datos');
-        throw err;
-      }
-
-      const spinner2 = ora(`Creando la tabla ${tabla}`).start();
-      spinner2.color = 'yellow';
-      await r.tableCreate(tabla).run(conn);
-      spinner2.clear();
-      spinner2.succeed(`La tabla ${tabla} creada con exito`);
-
-      const spinner3 = ora(`Migrando datos de la tabla ${tabla}`).start();
-      spinner3.color = 'yellow';
-      r.table(tabla).insert(data).run(conn, function(err, result) {
-        if (err) {
-          spinner3.clear();
-          spinner3.fail('Fallo al migrar datos');
-         throw err;
-       }
-       spinner3.clear();
-       spinner3.succeed(`Los datos de la tabla ${tabla} migrados correctamente`);
-      });     
-  });
+  try {
+      const conn = await r.connect(databaseR); 
+      await r.tableCreate(tabla).run(conn);        
+      await r.table(tabla).insert(data).run(conn);     
+      return true;
+  } catch (error) {
+    spinner.clear();
+    spinner.fail(`Error al migrar DB: ${JSON.stringify(error)}`);
+    throw 'fail';
+  }
 }
+
 
 async function obtenerDatosTabla(tabla = '', condicion = '', campos = '*') {
   try {
@@ -65,7 +53,7 @@ async function obtenerDatosTabla(tabla = '', condicion = '', campos = '*') {
   }  
 }
 
-async function factura() {
+const factura = new Promise(async (resolve, reject) => { 
   try {    
     const facturas = await obtenerDatosTabla('Factura');  
     const totalFilas = facturas.length;
@@ -81,14 +69,14 @@ async function factura() {
         console.log(err);
       });
 
-      await saveRethinkDB('Factura', result);
+      resolve(await saveRethinkDB('Factura', result));
     }
   } catch (error) {
    console.log(error);
   }
-}
+});
 
-async function habitacion() {
+const habitacion = new Promise(async (resolve, reject) => { 
   try {    
     const habitacion = await obtenerDatosTabla('Habitacion');  
     const totalFilas = habitacion.length;
@@ -103,14 +91,14 @@ async function habitacion() {
         console.log(err);
       });
 
-      await saveRethinkDB('Habitacion', result);
+      resolve(await saveRethinkDB('Habitacion', result));
     }
   } catch (error) {
    console.log(error);
   }
-}
+});
 
-async function servicio() {
+const servicio = new Promise(async (resolve, reject) => { 
   try {    
     const servicio = await obtenerDatosTabla('Servicio');  
     const totalFilas = servicio.length;
@@ -126,15 +114,14 @@ async function servicio() {
         console.log(err);
       });
 
-      await saveRethinkDB('Servicio', result);
+      resolve(await saveRethinkDB('Servicio', result));
     }
   } catch (error) {
    console.log(error);
   }
-}
+});
 
-async function cliente() {
-  try {    
+const cliente = new Promise(async (resolve, reject) => { 
     const cliente = await obtenerDatosTabla('Cliente');  
     const totalFilas = cliente.length;
     if ( totalFilas > 0) {
@@ -148,15 +135,14 @@ async function cliente() {
         console.log(err);
       });
 
-      await saveRethinkDB('Cliente', result);
+      const res = await saveRethinkDB('Cliente', result);
+      resolve(res);
     }
-  } catch (error) {
-   console.log(error);
-  }
-}
+}, err => {
+  throw err;
+})
 
-async function empleado() {
-  try {    
+const empleado =  new Promise(async (resolve, reject) => { 
     const empleado = await obtenerDatosTabla('Empleado');  
     const totalFilas = empleado.length;
     if ( totalFilas > 0) {
@@ -171,21 +157,31 @@ async function empleado() {
      const result = await Promise.all(arrayProcess).catch(err => {
         console.log(err);
       });
-
-      await saveRethinkDB('Empleado', result);
+      const res = await saveRethinkDB('Empleado', result);
+      resolve(res);
     }
-  } catch (error) {
-   console.log(error);
-  }
-}
+  }, err => {
+    throw err;
+  }); 
 
-async function main() {  
- await Promise.all([factura(), habitacion(), servicio(), empleado(), cliente()]).catch(err => {
-    console.log('Error main',err);
+  // new Promise((rejec, resolve) => {
+  // await Promise.all([factura(), habitacion(), servicio(), empleado(), cliente()]).catch(err => {
+  //     console.log('Error main',err);
+  //   });
+  // })
+
+  const spinner = ora(`Creando tablas y migrando datos ...`).start();
+  const spinner2 = null;
+  spinner.color = 'yellow';
+  Promise.all([empleado, cliente, factura, servicio, habitacion]).then(async val => {
+    spinner.succeed(`Migración ha terminado con éxito`);
+    spinner2 = ora(`Creando índices en las tablas...`).start();
+    await indexTablas();    
+    spinner2.succeed(`Índices creados con éxito`);
+  }).catch(err => {    
+    spinner.clear();
+    spinner.fail(`Error al migrar DB: ${JSON.stringify(err)}`);
   });
-  console.log('sigaaaaaaaaaaa index');
+
    // creando index    
    //await indexTablas(conexionG);
-}
-
-main();

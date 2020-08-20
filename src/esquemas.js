@@ -133,7 +133,7 @@ module.exports = {
         facturas: datafacturas
       },
       codSer: fila.CodS,
-      hablimpieza: limpiezas
+      habitacionAseo: limpiezas
     }
     return esquemaEmpleado;
   },

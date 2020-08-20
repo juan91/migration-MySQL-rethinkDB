@@ -85,7 +85,7 @@ factura
     ]
   },
   codSer:1,
-  hablimpieza: [
+  habitacionAseo: [
     {
       numero: 1,
       fecha: "24/09/2010"

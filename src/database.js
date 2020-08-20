@@ -11,7 +11,6 @@ pool.getConnection((err, connection) => {
   }
 
   if (connection) {
-    console.log('Conecction DB MYSQL Successful');
     return;
   }
 });
