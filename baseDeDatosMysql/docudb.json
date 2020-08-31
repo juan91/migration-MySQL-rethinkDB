@@ -1,13 +1,29 @@
 factura
 {
-  codigoF: 1,
+  CodigoF: 1,
   entrada: "01/01/20100",
   salida:"04/01/2010",
-  DNI:1111,
+  cliente: {
+    DNI: 1111,
+    Nombre: "Francisco",
+    Apellidos: "Vilansó Rodríguez",
+    Domicilio: "General Rodrigos 24",
+    Telefono: 999666565,
+  },
   total:360,
   supletoria:30,
-  numeroHabitacion: 100,
-  formaPago:[
+  habitacion: { 
+    Numero: 100,
+    superficie:15,
+    bar:"SI",
+    terraza:"SI",
+    puedesupletoria:"SI",
+    Tipo:{
+      Tipo: doble,
+      precio:90
+    }
+  },
+  Forma:[
     {
       forma: "efectivo",
       comision: 0
@@ -21,33 +37,33 @@ factura
 
 //habitacion
 {
-  numero: 100,
+  Numero: 100,
   superficie:15,
   bar:"SI",
   terraza:"SI",
   puedesupletoria:"SI",
-  tipo:{
-    tipo: doble,
+  Tipo:{
+    Tipo: doble,
     precio:90
   }
 }
 
 //servicio
 {
- codServ:1,
+ CodS:1,
  descripcion: "tintoreria",
  costeinterno: 50,
  usaServicio: [
    {
-    codServ:5,
+    CodServ:5,
     fecha: "24/09/2010"
    },
    {
-    codServ:2,
+    CodServ:2,
     fecha: "24/09/2010"
    }, 
   ],
-  responsable: 2,
+  NumReg: 2,
 }
 
 //cliente
@@ -84,7 +100,7 @@ factura
       }
     ]
   },
-  codSer:1,
+  CodS:1,
   habitacionAseo: [
     {
       numero: 1,

@@ -1,10 +1,12 @@
 module.exports = {
-   esquemaFactura(fila, formaP = null, incluye = null) {
+   esquemaFactura(fila, formaP = null, incluye = null, habitacion = null, cliente = null) {
     let servicios =  [];
-    let formaPago =  null;
+    let datahabitacion = null;
+    let Forma =  null;
+    let dataCliente =  null;
   
     if (formaP && formaP.length > 0) {
-      formaPago = {
+      Forma = {
         forma: formaP[0].Forma,
         comision: formaP[0].comision
       }
@@ -14,17 +16,38 @@ module.exports = {
       incluye.forEach(element => {
         servicios.push({ codSe:element.CodS, coste:element.coste, fecha:element.fecha })  
       });
-      
     }
+    
+    if (habitacion && habitacion.length > 0) {
+      datahabitacion = { 
+          Numero: habitacion[0].Numero,
+          superficie: habitacion[0].superficie,
+          bar:habitacion[0].bar,
+          terraza:habitacion[0].terraza,
+          puedesupletoria:habitacion[0].puedesupletoria,
+          Tipo: habitacion[0].tipoH,
+        };
+    }
+
+    if (cliente && cliente.length > 0) {
+      dataCliente = {
+        DNI: cliente[0].DNI,
+        Nombre:cliente[0].Nombre,
+        Apellidos: cliente[0].Apellidos,
+        Domicilio: cliente[0].Domicilio,
+        Telefono: cliente[0].Telefono,
+      }
+    }
+  
     const esquemaFactura = {
-      codigoF: fila.CodigoF,
+      CodigoF: fila.CodigoF,
       entrada: fila.Entrada,
-      salida:fila.Salida,
-      DNI:fila.DNI,
-      total:fila.Total,
-      supletoria:fila.supletoria,
-      numeroHabitacion: fila.Numero,
-      formaPago,
+      salida: fila.Salida,
+      cliente: dataCliente,
+      total: fila.Total,
+      supletoria: fila.supletoria,
+      Habitacion: datahabitacion,
+      Forma,
       servicios,
     };
     return esquemaFactura;
@@ -35,16 +58,16 @@ module.exports = {
     let dataTipos = null;
 
     if (tipo  && tipo.length > 0) {     
-        dataTipos = { tipo: tipo[0].Tipo, precio: tipo[0].precio }       
+        dataTipos = { Tipo: tipo[0].Tipo, precio: tipo[0].precio }       
     }
 
     const esquemaHabitacion = {
-      numero: fila.Numero,
+      Numero: fila.Numero,
       superficie: fila.superficie,
       bar: fila.bar,
       terraza: fila.terraza,
       puedesupletoria: fila.puedesupletoria,
-      tipo: dataTipos,
+      Tipo: dataTipos,
     }
     return esquemaHabitacion;
   },
@@ -67,11 +90,11 @@ module.exports = {
     }
 
     const esquemaServicio = {
-      codServ: fila.CodS,
+      CodS: fila.CodS,
       descripcion: fila.Descripcion,
       costeinterno: fila.costeinterno,
       usaServicio: usaSer,
-      responsable: fila.NumReg,
+      NumReg: fila.NumReg,
     }
     return esquemaServicio;
   },
@@ -103,7 +126,6 @@ module.exports = {
     let datalimpiezas = [];
     let dataProveedor = null;
     if (proveedor && proveedor.length > 0) {
-    
       dataProveedor = {
         NIF: proveedor[0].NIF,
         nombre: proveedor[0].Nombre,
@@ -132,7 +154,7 @@ module.exports = {
         dataProveedor,
         facturas: datafacturas
       },
-      codSer: fila.CodS,
+      CodS: fila.CodS,
       habitacionAseo: limpiezas
     }
     return esquemaEmpleado;

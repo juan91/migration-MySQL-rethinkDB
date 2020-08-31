@@ -43,8 +43,8 @@ async function main() {
 
     //# C
    console.time('time');
-  const result = await obtenerDatosTabla('Cliente',`where DNI IN (Select DNI from (SELECT DNI,Tipo, count(*) FROM Factura join Habitacion on Habitacion.Numero = Factura.Numero group by DNI, Tipo) as mitable
-  group by DNI having count(*)  = (select count(*) from Precio))`,'*');
+  const result = await obtenerDatosTabla('Factura',`f NATURAL JOIN Habitacion h NATURAL JOIN Cliente c
+  WHERE h.Tipo = 'Individual' AND f.DNI IN (SELECT f2.DNI FROM Factura f2 NATURAL JOIN Habitacion h2 WHERE h2.Tipo = 'Doble')`,'DISTINCT c.DNI, c.Nombre, c.Apellidos');
   console.log(result);
   console.timeEnd('time');
 }
