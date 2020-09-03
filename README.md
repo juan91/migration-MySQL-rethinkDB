@@ -1,6 +1,8 @@
 # MIGRANDO UNA BASE DE DATOS DE MYSQL A RETHINKDB
 
-Este script permite migrar de base de datos correspondiente a un hotel implementada en MySQL a una base de datos NoSQL orientada a documentos como es RETHINKDB
+La base de datos corresponde  a la de una hotel
+
+Este script migra la base de datos desde MySQL a una base de datos NoSQL orientada a documentos como es RETHINKDB
 
 
 # Requerimientos
@@ -23,3 +25,8 @@ Para iniciar a desarrollar es necesario tener instalado los siguiente:
 - npm run start
 
 # realizar consultar
+hay 5 consultas correspondientes al hotel
+- Las consultas hechas mysql se cuentrán en src/consultasMysql.js
+- Las consultas hechas rethinkdb se cuentrán en src/consultasrethinkdb.js
+- para ejecutar las consulta de mysql: npm run cm
+- para ejecutar las consulta de rethinkdb: npm run cr
