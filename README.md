@@ -2,12 +2,12 @@
 
 La base de datos corresponde  a la de una hotel
 
-Este script migra la base de datos desde MySQL a una base de datos NoSQL orientada a documentos como es RETHINKDB
+El Script migra la base de datos desde MySQL a una base de datos NoSQL orientada a documentos como es RETHINKDB
 
 
 # Requerimientos
 
-Para iniciar a desarrollar es necesario tener instalado los siguiente:
+Para iniciar es necesario tener instalado lo siguiente:
 
 - [Git](https://git-scm.com/book/es/v2/Inicio---Sobre-el-Control-de-Versiones-Instalaci%C3%B3n-de-Git)
 - [Nodejs10.X](https://nodejs.org/en/download/releases/)
