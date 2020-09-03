@@ -5,9 +5,10 @@
   "description": "MIGRACION DE UNA BASE DE DATOS RELACIONAL(MYSQL) A UNA NO RELACIONAL(RETHINKDB)",
   "main": "index.js",
   "scripts": {
-    "dev": "node src/index",
+    "start": "node src/index",
     "cr": "node src/consultasrethinkdb",
-    "cm": "node src/consultasMysql"
+    "cm": "node src/consultasMysql",
+    "up:db": "sh ./scriptdb/index.sh"
   },
   "repository": {
     "type": "git",

@@ -12,24 +12,16 @@ factura
   },
   total:360,
   supletoria:30,
-  habitacion: { 
+  Habitacion: { 
     Numero: 100,
     superficie:15,
     bar:"SI",
     terraza:"SI",
     puedesupletoria:"SI",
-    Tipo:{
-      Tipo: doble,
-      precio:90
-    }
+    Tipo:{Tipo: doble, precio:90}
   },
-  Forma:[
-    {
-      forma: "efectivo",
-      comision: 0
-    }
-  ],
-  incluye:[
+  Forma:  {forma: "efectivo", comision: 0},
+  servicios:[
     {codSe:1,coste:25,fecha:"01/01/2010"},
     {codSe:2,coste:15,fecha:"01/01/2010"},
   ]

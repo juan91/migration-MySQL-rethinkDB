@@ -13,4 +13,4 @@ services:
       MYSQL_USER: juan
       MYSQL_PASSWORD: c4d*dBr00t+
     volumes:
-      - ./data/hoteldb/:/var/lib/mysql2
+      - ./data/hoteldbd/:/var/lib/mysql2

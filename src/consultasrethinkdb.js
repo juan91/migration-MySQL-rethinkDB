@@ -65,40 +65,12 @@ r.connect( databaseR, async function(err, conn) {
   
 
    // consulta d
-    console.time("time");
-    r.table("Empleado").pluck("NumReg", {"habitacionAseo":["Numero"]}).filter(data => {
-      return data("habitacionAseo").ne([])
-    }).map(data => {
-      return {
-        HabitacionesLimpiadas: data("habitacionAseo").pluck("Numero").distinct().count(),
-        Numreg: data("NumReg")
-      }
-    }).filter(data => {
-      return data("HabitacionesLimpiadas").eq(r.table("Habitacion").count())
-    }).eqJoin("Numreg", r.table("Empleado"), {index: "NumReg"}).zip().pluck("nombre","sueldo","incorporacion")
-    .run(conn, function(err, cursor){
-        if (err) throw err;
-        cursor.toArray(function(err, result) {
-         console.log(JSON.stringify(result));
-        });
-        console.timeEnd("time");
-    });
-
-
-    /// consulta e
-
     // console.time("time");
-    // r.table("Empleado").filter((data) => {
-    //  return r.table("Servicio")("NumReg").contains(data("NumReg")).not()
+    // r.table("Empleado").pluck({"habitacionAseo":["Numero"]}, 'nombre','sueldo','incorporacion').filter(data => {
+    //   return data("habitacionAseo").ne([])
     // }).filter(data => {
-    //   return data("proveedorEncargado")("facturas").ne([])
-    // }).map(data => {
-    //   return {
-    //     encargado: data('nombre'),
-    //     nombre: data('proveedorEncargado')('dataProveedor')('nombre'),
-    //     facturas: data('proveedorEncargado')('facturas'), 
-    //   }
-    // })
+    //   return data("habitacionAseo").pluck("Numero").distinct().count().eq(r.table("Habitacion").count())
+    // }).pluck('nombre','sueldo','incorporacion')
     // .run(conn, function(err, cursor){
     //     if (err) throw err;
     //     cursor.toArray(function(err, result) {
@@ -106,6 +78,29 @@ r.connect( databaseR, async function(err, conn) {
     //     });
     //     console.timeEnd("time");
     // });
+
+
+    /// consulta e
+
+    console.time("time");
+    r.table("Empleado").filter((data) => {
+     return r.table("Servicio")("NumReg").contains(data("NumReg")).not()
+    }).filter(data => {
+      return data("proveedorEncargado")("facturas").ne([])
+    }).map(data => {
+      return {
+        encargado: data('nombre'),
+        nombre: data('proveedorEncargado')('dataProveedor')('nombre'),
+        facturas: data('proveedorEncargado')('facturas'), 
+      }
+    })
+    .run(conn, function(err, cursor){
+        if (err) throw err;
+        cursor.toArray(function(err, result) {
+         console.log(JSON.stringify(result));
+        });
+        console.timeEnd("time");
+    });
 
  
 
