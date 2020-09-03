@@ -8,7 +8,7 @@
     "start": "node src/index",
     "cr": "node src/consultasrethinkdb",
     "cm": "node src/consultasMysql",
-    "up:db": "sh ./scriptdb/index.sh"
+    "up:db": "sh ./loadmysql/index.sh"
   },
   "repository": {
     "type": "git",

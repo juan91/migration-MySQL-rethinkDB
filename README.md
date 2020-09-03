@@ -15,13 +15,13 @@ Para iniciar a desarrollar es necesario tener instalado los siguiente:
 - [Docker-compose](https://docs.docker.com/compose/install/)
 
 
-# instalar y cargar data en mysql 
-- npm run up:db
+# Instalar Mysql y cargar datos
+- npm run up:db (utiliza sudo en caso de no tener permisos)
 
 # Instalar RethinkDB
 - [Rethinkdb](https://rethinkdb.com/docs/install/)
 
-# Migrar de MySQL a RethinkDB
+# Migrar base de datos desde MySQL a RethinkDB
 - npm run start
 
 # realizar consultar
