@@ -1,6 +1,6 @@
 # MIGRANDO UNA BASE DE DATOS DE MYSQL A RETHINKDB
 
-La base de datos corresponde a la de una Hotel [DB Hotel](https://github.com/juan91/migration-MySQL-rethinkDB/tree/master/baseDeDatosMysql)
+La base de datos corresponde a la de una [Hotel](https://github.com/juan91/migration-MySQL-rethinkDB/tree/master/baseDeDatosMysql)
 
 El Script migra la base de datos desde MySQL a una base de datos NoSQL orientada a documentos como es RETHINKDB
 
