@@ -16,7 +16,7 @@ Para iniciar es necesario tener instalado lo siguiente:
 
 
 # Instalar Mysql y cargar datos
-- npm run up:db (utiliza sudo en caso de no tener permisos)
+- npm run up:db (utilizar sudo en caso de no tener permisos)
 
 # Instalar RethinkDB
 - [Rethinkdb](https://rethinkdb.com/docs/install/)
