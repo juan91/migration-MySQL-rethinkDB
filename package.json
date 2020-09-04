@@ -2,7 +2,7 @@
   "name": "migration-mysql-rethinkdb",
   "authot": "JUAN DAVID DELGADO",
   "version": "1.0.0",
-  "description": "MIGRACION DE UNA BASE DE DATOS RELACIONAL(MYSQL) A UNA NO RELACIONAL(RETHINKDB)",
+  "description": "MIGRANDO UNA BASE DE DATOS DE MYSQL A RETHINKDB",
   "main": "index.js",
   "scripts": {
     "start": "node src/index",
