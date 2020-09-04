@@ -21,6 +21,9 @@ Para iniciar es necesario tener instalado lo siguiente:
 # Instalar RethinkDB
 - [Rethinkdb](https://rethinkdb.com/docs/install/)
 
+# Instalar dependencias
+- npm install
+
 # Migrar base de datos desde MySQL a RethinkDB
 - npm run start
 
