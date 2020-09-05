@@ -1,4 +1,4 @@
-const pool = require('./database');
+const pool = require('./conexionMysql');
 const r = require('rethinkdb');
 const { databaseR } = require('./key');
 const ora = require('ora');

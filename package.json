@@ -1,6 +1,6 @@
 {
   "name": "migration-mysql-rethinkdb",
-  "authot": "JUAN DAVID DELGADO",
+  "authot": "JUAN DAVID DELGADO J",
   "version": "1.0.0",
   "description": "MIGRANDO UNA BASE DE DATOS DE MYSQL A RETHINKDB",
   "main": "index.js",

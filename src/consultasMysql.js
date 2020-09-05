@@ -1,4 +1,4 @@
-const pool = require('./database');
+const pool = require('./conexionMysql');
 
 async function obtenerDatosTabla(tabla = '', condicion = '', campos = '*') {
   try {
