@@ -33,3 +33,6 @@ hay 5 consultas correspondientes al hotel
 - Las consultas hechas rethinkdb se cuentrán en src/consultasrethinkdb.js
 - para ejecutar las consulta de mysql: npm run cm
 - para ejecutar las consulta de rethinkdb: npm run cr
+
+# Para más información de la basde de datos RethinkDB, visitar su página oficial
+[RethinkDB](https://rethinkdb.com/)
