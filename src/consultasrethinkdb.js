@@ -5,22 +5,23 @@ const { databaseR } = require("./key");
 r.connect( databaseR, async function(err, conn) {   
   if (err) throw err;
   /// consulta a
-  // console.time("time");
+  // console.time("timeA");
   // r.table("Empleado").filter({nombre:"Jorge Alonso Alonso"}).pluck("CodS").eqJoin("CodS", r.table("Servicio"), {index: "CodS"}).zip().pluck("NumReg").eqJoin(
   //   "NumReg", r.table("Empleado"), {index: "NumReg"}
   // ).zip().pluck("nombre")
   // .run(conn, function(err, cursor){
   //     if (err) throw err;
   //     cursor.toArray(function(err, result) {
+  //       console.log('******************CONSULTA A**************************');
   //       console.log(JSON.stringify(result));
   //     });
-  //     console.timeEnd("time");
+  //     console.timeEnd("timeA");
   // });
 
 
 
   /// consulta b
-  //  console.time("time");
+  //  console.time("timeB");
   // r.table("Factura").filter({salida: null})
   // .pluck({"Habitacion":{"Tipo": {"Tipo": true, "precio":true}, "Numero": true}}).map(data => {
   //   return {
@@ -32,14 +33,15 @@ r.connect( databaseR, async function(err, conn) {
   // .run(conn, function(err, cursor){
   //     if (err) throw err;
   //     cursor.toArray(function(err, result) {
+  //       console.log('******************CONSULTA B**************************');
   //       console.log(JSON.stringify(result));
   //     });
-  //     console.timeEnd("time");
+  //     console.timeEnd("timeB");
   // });
 
 
 
-//   console.time("time");
+//   console.time("timeC");
 //   r.table("Factura").pluck({"cliente":{"DNI": true}}, {"Habitacion":{"Tipo":{"Tipo": true}}})
 //   .filter(data => {
 //     return data("Habitacion")("Tipo")("Tipo").eq("individual")
@@ -58,14 +60,15 @@ r.connect( databaseR, async function(err, conn) {
 // .run(conn, function(err, cursor){
 //       if (err) throw err;
 //       cursor.toArray(function(err, result) {
+//        console.log('******************CONSULTA C**************************');
 //        console.log(JSON.stringify(result));
 //       });
-//       console.timeEnd("time");
+//       console.timeEnd("timeC");
 //   });
   
 
    // consulta d
-    // console.time("time");
+    // console.time("timeD");
     // r.table("Empleado").pluck({"habitacionAseo":["Numero"]}, 'nombre','sueldo','incorporacion').filter(data => {
     //   return data("habitacionAseo").ne([])
     // }).filter(data => {
@@ -74,15 +77,15 @@ r.connect( databaseR, async function(err, conn) {
     // .run(conn, function(err, cursor){
     //     if (err) throw err;
     //     cursor.toArray(function(err, result) {
-    //      console.log(JSON.stringify(result));
+    //       console.log('******************CONSULTA D**************************');
+    //       console.log(JSON.stringify(result));
     //     });
-    //     console.timeEnd("time");
+    //     console.timeEnd("timeD");
     // });
-
 
     /// consulta e
 
-    console.time("time");
+    console.time("timeE");
     r.table("Empleado").filter((data) => {
      return r.table("Servicio")("NumReg").contains(data("NumReg")).not()
     }).filter(data => {
@@ -97,11 +100,12 @@ r.connect( databaseR, async function(err, conn) {
     .run(conn, function(err, cursor){
         if (err) throw err;
         cursor.toArray(function(err, result) {
-         console.log(JSON.stringify(result));
+          console.log('******************CONSULTA E**************************');
+          console.log(JSON.stringify(result));
         });
-        console.timeEnd("time");
+        console.timeEnd("timeE");
     });
 
- 
 
 });
+

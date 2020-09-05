@@ -150,11 +150,11 @@ module.exports = {
       nombre: fila.Nombre,
       incorporacion: fila.Incorporacion,
       sueldo: fila.Sueldo,
+      CodS: fila.CodS,
       proveedorEncargado: {
         dataProveedor,
         facturas: datafacturas
       },
-      CodS: fila.CodS,
       habitacionAseo: limpiezas
     }
     return esquemaEmpleado;

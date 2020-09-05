@@ -1,0 +1,64 @@
+CONSULTAS PARA HACERLAS EN LA PLATAFORMA DATA EXPLORE DE RETHINKDB
+
+ A)
+var db = r.db('hotel');
+db.table("Empleado").filter({nombre:"Jorge Alonso Alonso"})
+  .pluck("CodS").eqJoin("CodS", db.table("Servicio"), {index: "CodS"})
+  .zip().pluck("NumReg")
+  .eqJoin("NumReg", db.table("Empleado"), {index: "NumReg"})
+  .zip().pluck("nombre")
+
+  b)
+  var db = r.db('hotel');
+ db.table("Factura").filter({salida: null})
+  .pluck({"Habitacion":{"Tipo": {"Tipo": true, "precio":true}, "Numero": true}}).map(data => {
+    return {
+      numero: data("Habitacion")("Numero"),
+      Tipo: data("Habitacion")("Tipo")("Tipo"),
+      Precio: data("Habitacion")("Tipo")("precio")
+    }
+  })
+
+  c)
+  var db = r.db('hotel');
+ db.table("Factura").pluck({"cliente":{"DNI": true}}, {"Habitacion":{"Tipo":{"Tipo": true}}})
+  .filter(data => {
+    return data("Habitacion")("Tipo")("Tipo").eq("individual")
+  })
+  .distinct()
+  .do(individual => {
+    return db.table("Factura")
+    .pluck({"cliente":{"DNI": true,"Nombre": true,"Apellidos":true}},
+      {"Habitacion":{"Tipo":{"Tipo": true}}})
+    .filter(data => {
+      return data("Habitacion")("Tipo")("Tipo").eq("doble")
+    })
+    .distinct().filter(doble => {
+      return individual("cliente")("DNI").contains(doble("cliente")("DNI"))
+    })
+  })
+  .pluck("cliente")
+
+  d)
+var db = r.db('hotel');
+ db.table("Empleado").pluck({"habitacionAseo":["Numero"]}, 'nombre','sueldo','incorporacion')
+   .filter(data => {
+      return data("habitacionAseo").ne([])
+    }).filter(data => {
+      return data("habitacionAseo").pluck("Numero").distinct().count().eq(db.table("Habitacion").count())
+    }).pluck('nombre','sueldo','incorporacion')
+
+  e)
+  var db = r.db('hotel');
+  db.table("Empleado").filter((data) => {
+      return db.table("Servicio")("NumReg").contains(data("NumReg")).not()
+      }).filter(data => {
+        return data("proveedorEncargado")("facturas").ne([])
+      }).map(data => {
+        return {
+          encargado: data('nombre'),
+          nombre: data('proveedorEncargado')('dataProveedor')('nombre'),
+          facturas: data('proveedorEncargado')('facturas'), 
+        }
+      })
+ 

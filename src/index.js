@@ -8,6 +8,27 @@ const { esquemaFactura, esquemaHabitacion, esquemaServicio, esquemaCliente, esqu
 const tables = ['Empleado','Cliente','Factura','Servicio','Habitacion'];
 let spinner = null;
 
+async function CrearTablasEnRethinkDB() {
+  return new Promise(async (resolve, reject) => {
+    let spinner = ora(`Creando tablas y llaves ...`).start();    
+    spinner.color = 'yellow';
+    const conn = await r.connect(databaseR); 
+    let arrayProcessTable = [];
+
+    for(let i = 0; i < tables.length; i+= 1) {
+      arrayProcessTable.push(obtenerPrimaryKeyDesdeMysqlYPasarARethink(tables[i], conn));
+    }
+    await Promise.all(arrayProcessTable);
+    spinner.clear();
+    spinner.succeed(`Tablas y llaves creados con éxito`);
+    resolve(true);
+  },(error) => {
+    spinner.stop();
+    spinner.fail(`Error al crear tablas ${JSON.stringify(error)}`);
+    reject(error)
+  });
+}
+
 async function obtenerDatosTablasMysql(tabla = '', condicion = '', campos = '*') {
   try {
     const resultado = await pool.query(`select ${campos} from ${tabla} ${condicion} `);  
@@ -43,27 +64,6 @@ function obtenerPrimaryKeyDesdeMysqlYPasarARethink(tabla = null, conn) {
         await r.tableCreate(tabla).run(conn);
       }
     }
-  });
-}
-
-async function CrearTablasEnRethinkDB() {
-  return new Promise(async (resolve, reject) => {
-    let spinner = ora(`Creando tablas e indices ...`).start();    
-    spinner.color = 'yellow';
-    const conn = await r.connect(databaseR); 
-    let arrayProcessTable = [];
-
-    for(let i = 0; i < tables.length; i+= 1) {
-      arrayProcessTable.push(obtenerPrimaryKeyDesdeMysqlYPasarARethink(tables[i], conn));
-    }
-    await Promise.all(arrayProcessTable);
-    spinner.clear();
-    spinner.succeed(`Tablas e indices creados con exito`);
-    resolve(true);
-  },(error) => {
-    spinner.stop();
-    spinner.fail(`Error al crear tablas ${JSON.stringify(error)}`);
-    reject(error)
   });
 }
 
@@ -193,13 +193,13 @@ function empleado () {
   }); 
 }
 
-async function main() {    
+async function main() {
   await CrearTablasEnRethinkDB();    
   spinner = ora(`Migrando datos de Mysql a RethinkDb...`).start();    
   spinner.color = 'magenta';
   Promise.all([empleado(), cliente(), habitacion(), factura(), servicio()]).then(async data => {
     spinner.clear();
-    spinner.succeed(`Migracion termino con exito`);
+    spinner.succeed(`Migración termino con éxito`);
   }).catch(err => {
     spinner.clear();
     spinner.fail(`Error al migrar DB: ${JSON.stringify(err)}`);
