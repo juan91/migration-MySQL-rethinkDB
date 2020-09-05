@@ -15,7 +15,7 @@ Para iniciar es necesario tener instalado lo siguiente:
 - [Docker-compose](https://docs.docker.com/compose/install/)
 
 
-# Instalar Mysql y cargar datos
+# Instalar Mysql(Docker) y cargar datos
 - npm run up:db (utilizar sudo en caso de no tener permisos)
 
 # Instalar RethinkDB
